@@ -1,10 +1,10 @@
 package example.micronaut
 
-import io.micronaut.core.annotation.Introspected
 import io.micronaut.core.annotation.NonNull
-import javax.validation.constraints.NotBlank
+import io.micronaut.serde.annotation.Serdeable
+import jakarta.validation.constraints.NotBlank
 
-@Introspected
+@Serdeable
 data class LinkedInMe(
     @field:NonNull @field:NotBlank @get:NonNull @param:NonNull val id: String,
     @field:NonNull @field:NotBlank @get:NonNull @param:NonNull val localizedFirstName: String,

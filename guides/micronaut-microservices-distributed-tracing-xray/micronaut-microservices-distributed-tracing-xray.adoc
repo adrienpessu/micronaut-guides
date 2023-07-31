@@ -31,7 +31,7 @@ image::flow-dynamodb.svg[]
 
 A request to `bookrecommendation` (`http://localhost:8080/books[http://localhost:8080/books^]`) triggers several requests through our microservices mesh.
 
-common:annotationprocessors.adoc[]
+https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html[Setup IntelliJ IDEA to develop Micronaut Applications].
 
 == Run AWS OTel Collector locally
 
@@ -70,6 +70,8 @@ To use AWS X-Ray propagator, each service adds the following dependency:
 dependency:opentelemetry-extension-aws[groupId=io.opentelemetry,scope=compile]
 
 and the following configuration:
+
+common:yaml-dependency.adoc[]
 
 resource:application.yml[app=bookrecommendation,tag=otel]
 

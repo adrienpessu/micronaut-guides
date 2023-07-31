@@ -27,7 +27,7 @@ The microservices are:
 
 * `chess-listener` - Receives the chess event messages and persists them to a database
 
-common:annotationprocessors.adoc[]
+https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html[Setup IntelliJ IDEA to develop Micronaut Applications].
 
 === chess-game Microservice
 
@@ -65,7 +65,7 @@ Create a `GameDTO` data-transfer object to represent game data:
 
 source:chess/dto/GameDTO[app=chess-game]
 
-callout:introspected[1]
+callout:serdeable[1]
 <2> Annotate with `@JsonTypeInfo` to include the class name without package in the `"_className"` property
 <3> Annotate with `@Creator` to indicate the constructor to use when deserializing from JSON
 
@@ -73,7 +73,7 @@ Create a `GameStateDTO` data-transfer object to represent game move data:
 
 source:chess/dto/GameStateDTO[app=chess-game]
 
-callout:introspected[1]
+callout:serdeable[1]
 <2> Annotate with `@JsonTypeInfo` to include the class name without package in the `"_className"` property
 
 ==== GameReporter
@@ -130,6 +130,8 @@ resource:application-dev.yml[app=chess-game]
 ==== Static Resources
 
 Update `application.yml` to add static resource configuration:
+
+common:yaml-dependency.adoc[]
 
 resource:application.yml[app=chess-game,tag=static-resources]
 
@@ -507,7 +509,7 @@ Create `src/main/resources/application-oraclecloud.yml` in the `chess-game` micr
 
 resource:application-oraclecloud.yml[app=chess-game]
 
-<1> Use the "FQDN" URL value you saved earlier here
+<1> Use the "FQDN" URL value you saved earlier here, along with the Kafka port (9092), e.g., `cell-1.streaming.us-ashburn-1.oci.oraclecloud.com:9092`
 <2> Use the value `config: org.apache.kafka.common.security.plain.PlainLoginModule required username="<tenancy-name>/<username>/<stream-pool-ocid>" password="<auth-token>";`, replacing `<tenancy-name>` with the name of your tenancy, `<username>` with the username created above, `<stream-pool-ocid>` with the OCID of the stream pool you saved earlier, and `<auth-token>` with the auth token value you saved earlier.
 <3> Limit request size to 1MB
 <4> Limit request size to 1MB per partition
@@ -568,12 +570,24 @@ callout:test-instance-per-class[2]
 <4> The Testcontainer instance for Kafka
 <5> Dependency injection for the `ChessListener` class declared below, a Kafka listener class that replicates the functionality of the class of the same name in the `chess-listener` microservice
 <6> Dependency injection for an HTTP client that the Micronaut framework will implement at compile to make calls to `GameController`
+:exclude-for-languages:java,groovy
+callout:atfield[7]
+callout:lateinit[8]
+<9> Wait a few seconds for the message to arrive; it should happen very quickly, but the message will be sent on a separate thread
+<10> Configure the Kafka broker port (it will be different unused port each time) so Micronaut Kafka clients and listeners connect to the test broker
+<11> Use a Map to hold form parameter names and values
+<12> Use the `HttpClient` to send a POST request that indicates a game has started, which will trigger sending a message with Kafka
+<13> Use the `HttpClient` to send a POST request that indicates a game move has occurred, which will trigger sending a message with Kafka
+<14> Use the `HttpClient` to send a POST request that indicates a game has ended (in either a draw or checkmate), which will trigger sending a message with Kafka
+:exclude-for-languages:
+:exclude-for-languages:kotlin
 <7> Wait a few seconds for the message to arrive; it should happen very quickly, but the message will be sent on a separate thread
 <8> Configure the Kafka broker port (it will be different unused port each time) so Micronaut Kafka clients and listeners connect to the test broker
 <9> Use a Map to hold form parameter names and values
 <10> Use the `HttpClient` to send a POST request that indicates a game has started, which will trigger sending a message with Kafka
 <11> Use the `HttpClient` to send a POST request that indicates a game move has occurred, which will trigger sending a message with Kafka
 <12> Use the `HttpClient` to send a POST request that indicates a game has ended (in either a draw or checkmate), which will trigger sending a message with Kafka
+:exclude-for-languages:
 
 === chess-listener tests
 

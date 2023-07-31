@@ -34,7 +34,7 @@ When a service wants to do a request to other service, it uses the discovery ser
 
 image::discovery-service-flow.svg[]
 
-common:annotationprocessors.adoc[]
+https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html[Setup IntelliJ IDEA to develop Micronaut Applications].
 
 === Catalogue Microservice
 
@@ -74,6 +74,8 @@ callout:http-request[3]
 <4> Parse easily JSON into Java objects.
 
 Edit `application.yml`
+
+common:yaml-dependency.adoc[]
 
 resource:application.yml[app=bookcatalogue,tag=mn]
 

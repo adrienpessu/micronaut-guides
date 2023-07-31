@@ -8,11 +8,12 @@
   "apps": [
     {
       "name": "books",
-      "features": ["graalvm", "rabbitmq", "mockito", "reactor"]
+      "features": ["yaml", "graalvm", "rabbitmq", "mockito", "reactor", "serialization-jackson"],
+      "kotlinFeatures": ["kapt"]
     },
     {
       "name": "analytics",
-      "features": ["graalvm", "rabbitmq"]
+      "features": ["yaml", "graalvm", "rabbitmq", "serialization-jackson"]
     }
   ]
 }

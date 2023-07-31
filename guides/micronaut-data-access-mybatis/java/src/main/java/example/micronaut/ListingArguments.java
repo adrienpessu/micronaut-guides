@@ -1,16 +1,17 @@
 package example.micronaut;
 
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
+import io.micronaut.serde.annotation.Serdeable;
 import io.micronaut.http.uri.UriBuilder;
 
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import java.net.URI;
 import java.util.Optional;
 
-@Introspected
+@Serdeable
 public class ListingArguments {
 
     @PositiveOrZero
@@ -28,41 +29,50 @@ public class ListingArguments {
     @Nullable
     private String order;
 
-    public ListingArguments() {
+    public ListingArguments(Integer offset, @Nullable Integer max, @Nullable String sort, @Nullable String order) {
+        this.offset = offset;
+        this.max = max;
+        this.sort = sort;
+        this.order = order;
     }
 
-    public Optional<Integer> getOffset() {
-        return Optional.ofNullable(offset);
+    @Nullable
+    public Integer getOffset() {
+        return offset;
     }
 
     public void setOffset(@Nullable Integer offset) {
         this.offset = offset;
     }
 
-    public Optional<Integer> getMax() {
-        return Optional.ofNullable(max);
+    @Nullable
+    public Integer getMax() {
+        return max;
     }
 
     public void setMax(@Nullable Integer max) {
         this.max = max;
     }
 
-    public Optional<String> getSort() {
-        return Optional.ofNullable(sort);
+    @Nullable
+    public String getSort() {
+        return sort;
     }
 
     public void setSort(@Nullable String sort) {
         this.sort = sort;
     }
 
-    public Optional<String> getOrder() {
-        return Optional.ofNullable(order);
+    @Nullable
+    public String getOrder() {
+        return order;
     }
 
     public void setOrder(@Nullable String order) {
         this.order = order;
     }
 
+    @NonNull
     public static Builder builder() {
         return new Builder();
     }
@@ -84,33 +94,46 @@ public class ListingArguments {
     }
 
     public static final class Builder {
-        private final ListingArguments args = new ListingArguments();
+        private Integer offset;
 
+        @Nullable
+        private Integer max;
+
+        @Nullable
+        private String sort;
+
+        @Nullable
+        private String order;
         private Builder() {
         }
 
+        @NonNull
         public Builder max(int max) {
-            args.setMax(max);
+            this.max = max;
             return this;
         }
 
+        @NonNull
         public Builder sort(String sort) {
-            args.setSort(sort);
+            this.sort = sort;
             return this;
         }
 
+        @NonNull
         public Builder order(String order) {
-            args.setOrder(order);
+            this.order = order;
             return this;
         }
 
+        @NonNull
         public Builder offset(int offset) {
-            args.setOffset(offset);
+            this.offset = offset;
             return this;
         }
 
+        @NonNull
         public ListingArguments build() {
-            return args;
+            return new ListingArguments(Optional.ofNullable(offset).orElse(0), max, sort, order);
         }
     }
 }

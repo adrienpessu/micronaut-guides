@@ -1,29 +1,29 @@
 package example.micronaut.domain;
 
-import io.micronaut.core.annotation.Introspected;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
+import io.micronaut.serde.annotation.Serdeable;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 
-@Introspected
+@Serdeable
 public class Book {
 
     @Nullable
     private Long id;
 
     @NonNull
-    @NotNull
+    @NotBlank
     private String name;
 
     @NonNull
-    @NotNull
+    @NotBlank
     private String isbn;
 
     private Genre genre;
 
-    public Book(@NonNull @NotNull String isbn,
-                @NonNull @NotNull String name,
+    public Book(@NonNull @NotBlank String isbn,
+                @NonNull @NotBlank String name,
                 Genre genre) {
         this.isbn = isbn;
         this.name = name;

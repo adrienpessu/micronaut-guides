@@ -1,6 +1,5 @@
 package io.micronaut.guides
 
-import groovy.io.FileType
 import groovy.json.JsonSlurper
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
@@ -8,7 +7,6 @@ import io.micronaut.context.ApplicationContext
 import io.micronaut.core.annotation.NonNull
 import io.micronaut.core.annotation.Nullable
 import io.micronaut.guides.GuideMetadata.App
-import io.micronaut.guides.GuideMetadata.OpenAPIGeneratorConfig
 import io.micronaut.starter.api.TestFramework
 import io.micronaut.starter.application.ApplicationType
 import io.micronaut.starter.options.BuildTool
@@ -24,11 +22,11 @@ import java.nio.file.Paths
 import java.time.LocalDate
 import java.util.regex.Pattern
 
+import static groovy.io.FileType.FILES
 import static io.micronaut.core.util.StringUtils.EMPTY_STRING
 import static io.micronaut.starter.api.TestFramework.JUNIT
 import static io.micronaut.starter.api.TestFramework.SPOCK
-import static io.micronaut.starter.options.JdkVersion.JDK_11
-import static io.micronaut.starter.options.JdkVersion.JDK_8
+import static io.micronaut.starter.options.JdkVersion.JDK_17
 import static io.micronaut.starter.options.Language.GROOVY
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING
 
@@ -41,7 +39,7 @@ class GuideProjectGenerator implements AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(this)
     private static final String APP_NAME = 'micronautguide'
     private static final String BASE_PACKAGE = 'example.micronaut'
-    private static final List<JdkVersion> JDK_VERSIONS_SUPPORTED_BY_GRAALVM = [JDK_8, JDK_11]
+    private static final List<JdkVersion> JDK_VERSIONS_SUPPORTED_BY_GRAALVM = [JDK_17]
 
     private final ApplicationContext applicationContext
     private final GuidesGenerator guidesGenerator
@@ -83,9 +81,9 @@ class GuideProjectGenerator implements AutoCloseable {
 
         List<Category> categories = []
         for (String c : config.categories) {
-            Category cat = Category.values().find {it.toString() == c }
+            Category cat = Category.values().find { it.toString() == c }
             if (cat) {
-                categories.add(cat)
+                categories << cat
             } else if (publish && !cat) {
                 throw new GradleException("$configFile.parentFile.name metadata.category=$config.category does not exist in Category enum")
             }
@@ -110,19 +108,19 @@ class GuideProjectGenerator implements AutoCloseable {
                 minimumJavaVersion: config.minimumJavaVersion,
                 maximumJavaVersion: config.maximumJavaVersion,
                 zipIncludes: config.zipIncludes ?: [],
-                apps: config.apps.collect { it -> new App(
-                        name: it.name,
-                        visibleFeatures: it.features ?: [],
-                        invisibleFeatures: it.invisibleFeatures ?: [],
-                        applicationType: it.applicationType ? ApplicationType.valueOf(it.applicationType.toUpperCase()) : ApplicationType.DEFAULT,
-                        excludeSource:  it.excludeSource,
-                        excludeTest:  it.excludeTest,
-                        openAPIGeneratorConfig: it.openAPIGeneratorConfig ? new OpenAPIGeneratorConfig(
-                            definitionFile: it.openAPIGeneratorConfig.definitionFile,
-                            generatorName: it.openAPIGeneratorConfig.generatorName ?: OpenAPIGeneratorConfig.GENERATOR_JAVA_MICRONAUT_SERVER,
-                            properties: it.openAPIGeneratorConfig.properties ?: [:],
-                            globalProperties: it.openAPIGeneratorConfig.globalProperties ?: [:]
-                        ) : null)
+                apps: config.apps.collect { it ->
+                    new App(
+                            framework: it.framework,
+                            testFramework: it.testFramework?.toUpperCase(),
+                            name: it.name,
+                            visibleFeatures: it.features ?: [],
+                            invisibleFeatures: it.invisibleFeatures ?: [],
+                            javaFeatures: it.javaFeatures ?: [],
+                            kotlinFeatures: it.kotlinFeatures ?: [],
+                            groovyFeatures: it.groovyFeatures ?: [],
+                            applicationType: it.applicationType ? ApplicationType.valueOf(it.applicationType.toUpperCase()) : ApplicationType.DEFAULT,
+                            excludeSource: it.excludeSource,
+                            excludeTest: it.excludeTest)
                 }
         ))
     }
@@ -166,8 +164,6 @@ class GuideProjectGenerator implements AutoCloseable {
             assert outputDir.mkdir()
         }
 
-        String packageAndName = BASE_PACKAGE + '.' + APP_NAME
-
         JdkVersion javaVersion = Utils.parseJdkVersion()
         if (metadata.minimumJavaVersion != null) {
             JdkVersion minimumJavaVersion = JdkVersion.valueOf(metadata.minimumJavaVersion)
@@ -187,9 +183,8 @@ class GuideProjectGenerator implements AutoCloseable {
             TestFramework testFramework = guidesOption.testFramework
             Language lang = guidesOption.language
 
-            for (App app: metadata.apps) {
-                List<String> appFeatures = [] + app.features
-
+            for (App app : metadata.apps) {
+                List<String> appFeatures = ([] as List<String>) + app.getFeatures(lang)
                 if (guidesOption.language == GROOVY ||
                         !JDK_VERSIONS_SUPPORTED_BY_GRAALVM.contains(javaVersion)) {
                     appFeatures.remove('graalvm')
@@ -200,20 +195,19 @@ class GuideProjectGenerator implements AutoCloseable {
                 }
 
                 // typical guides use 'default' as name, multi-project guides have different modules
-                String appName = app.name == DEFAULT_APP_NAME ? EMPTY_STRING : app.name
                 String folder = folderName(metadata.slug, guidesOption)
+
+                String appName = app.name == DEFAULT_APP_NAME ? EMPTY_STRING : app.name
+
 
                 Path destinationPath = Paths.get(outputDir.absolutePath, folder, appName)
                 File destination = destinationPath.toFile()
                 destination.mkdir()
 
-                if (app.openAPIGeneratorConfig) {
-                    OpenAPIGenerator.generate(inputDir, destination, lang, BASE_PACKAGE, app.openAPIGeneratorConfig, testFramework, buildTool)
-                    deleteEveryFileButSources(destination)
-                }
+                String packageAndName = BASE_PACKAGE + '.' + app.name
 
-                guidesGenerator.generateAppIntoDirectory(destination, app.applicationType, packageAndName,
-                        appFeatures, buildTool, testFramework, lang, javaVersion)
+                guidesGenerator.generateAppIntoDirectory(destination, app.applicationType, packageAndName, app.getFramework(),
+                        appFeatures, buildTool, app.testFramework ?: testFramework, lang, javaVersion)
 
                 if (metadata.base) {
                     File baseDir = new File(inputDir.parentFile, metadata.base)
@@ -230,7 +224,7 @@ class GuideProjectGenerator implements AutoCloseable {
 
                 if (app.excludeTest) {
                     for (String testSource : app.excludeTest) {
-                        deleteFile(destination, GuideAsciidocGenerator.testPath(appName,  testSource, testFramework), guidesOption)
+                        deleteFile(destination, GuideAsciidocGenerator.testPath(appName, testSource, testFramework), guidesOption)
                     }
                 }
 
@@ -389,6 +383,9 @@ class GuideProjectGenerator implements AutoCloseable {
             App guideApp = guideApps[name]
             guideApp.visibleFeatures.addAll baseApp.visibleFeatures
             guideApp.invisibleFeatures.addAll baseApp.invisibleFeatures
+            guideApp.javaFeatures.addAll baseApp.javaFeatures
+            guideApp.kotlinFeatures.addAll baseApp.kotlinFeatures
+            guideApp.groovyFeatures.addAll baseApp.groovyFeatures
             merged << guideApp
         }
 
@@ -407,7 +404,7 @@ class GuideProjectGenerator implements AutoCloseable {
     }
 
     static void deleteEveryFileButSources(File dir) {
-        dir.eachFileRecurse(FileType.FILES) { file ->
+        dir.eachFileRecurse(FILES) { file ->
             if (!(file ==~ GROOVY_JAVA_OR_KOTLIN)) {
                 file.delete()
             }
@@ -416,19 +413,20 @@ class GuideProjectGenerator implements AutoCloseable {
     }
 
     static void deleteEmptySubDirectories(File dir) {
-        for (;;) {
+        for (; ;) {
             if (deleteSubDirectories(dir) == 0) {
                 break
             }
         }
     }
+
     static int deleteSubDirectories(File dir) {
         int deleted = 0
 
         List<File> emptyDirs = []
         dir.eachDirRecurse { f ->
             if (f.listFiles().length == 0) {
-                emptyDirs.add(f)
+                emptyDirs << f
             }
         }
         emptyDirs.each { f ->

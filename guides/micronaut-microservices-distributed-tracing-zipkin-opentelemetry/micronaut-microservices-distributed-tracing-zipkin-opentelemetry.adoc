@@ -30,7 +30,7 @@ image::flow.svg[]
 
 A request to `bookrecommendation` (http://localhost:8080/books) triggers several requests through our microservices mesh.
 
-common:annotationprocessors.adoc[]
+https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html[Setup IntelliJ IDEA to develop Micronaut Applications].
 
 == Zipkin and the Micronaut Framework
 
@@ -57,6 +57,8 @@ Each service adds the OpenTelemetry Zipkin exporter dependency.
 dependency:opentelemetry-exporter-zipkin[groupId=io.opentelemetry,scope=compile]
 
 Each service sets `zipkin` as exporter in configuration:
+
+common:yaml-dependency.adoc[]
 
 resource:application.yml[app=bookcatalogue,tag=zipkin]
 

@@ -2,28 +2,28 @@ package example.micronaut.domain
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import groovy.transform.CompileStatic
-import io.micronaut.core.annotation.Introspected
 import io.micronaut.core.annotation.NonNull
 import io.micronaut.core.annotation.Nullable
+import io.micronaut.serde.annotation.Serdeable
 
-import javax.validation.constraints.NotNull
+import jakarta.validation.constraints.NotBlank
 
 @CompileStatic
-@Introspected
+@Serdeable
 class Genre {
 
     @Nullable
     Long id
 
-    @NotNull
     @NonNull
+    @NotBlank
     String name
 
     @NonNull
     @JsonIgnore
     Set<Book> books = []
 
-    Genre(@NonNull @NotNull String name) {
+    Genre(@NonNull @NotBlank String name) {
         this.name = name
     }
 

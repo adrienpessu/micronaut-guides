@@ -1,11 +1,10 @@
 package example.micronaut;
 
-import io.micronaut.core.annotation.Introspected;
 import io.micronaut.core.annotation.NonNull;
+import io.micronaut.serde.annotation.Serdeable;
+import jakarta.validation.constraints.NotBlank;
 
-import javax.validation.constraints.NotBlank;
-
-@Introspected
+@Serdeable
 public class LinkedInMe {
 
     @NonNull

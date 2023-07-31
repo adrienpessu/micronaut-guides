@@ -14,13 +14,13 @@ import io.micronaut.http.annotation.Get
 import io.micronaut.http.annotation.Post
 import io.micronaut.http.annotation.Put
 import java.net.URI
-import javax.validation.Valid
+import jakarta.validation.Valid
 
 @Controller("/genres") // <1>
 open class GenreController(private val genreRepository: GenreRepository) { // <2>
 
     @Get("/{id}") // <3>
-    fun show(id: Long): Genre = genreRepository.findById(id).orElse(null) // <4>
+    fun show(id: Long): Genre? = genreRepository.findById(id).orElse(null) // <4>
 
     @Put // <5>
     open fun update(@Body @Valid command: GenreUpdateCommand): HttpResponse<*> { // <6>

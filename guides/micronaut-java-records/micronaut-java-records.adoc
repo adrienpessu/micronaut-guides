@@ -31,7 +31,7 @@ common:default-package.adoc[]
 
 NOTE: If you use https://launch.micronaut.io[Micronaut Launch], select "Micronaut Application" as application type and add `postgres`, `data-jdbc`, and `liquibase` as features.
 
-common:annotationprocessors.adoc[]
+https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html[Setup IntelliJ IDEA to develop Micronaut Applications].
 
 === Immutable Configuration with Java Records
 
@@ -56,6 +56,8 @@ Add the following snippet to include the necessary dependencies:
 dependency:micronaut-liquibase[groupId=io.micronaut.liquibase]
 
 Configure the database migrations directory for http://www.liquibase.org[Liquibase] in `application.yml`.
+
+common:yaml-dependency.adoc[]
 
 resource:application.yml[tag=liquibase]
 
@@ -86,7 +88,7 @@ Create a record to project some data from the `book` table. For example, exclude
 
 source:BookCard[]
 
-callout:introspected[1]
+callout:serdeable[1]
 callout:constraints[2]
 
 Create a https://micronaut-projects.github.io/micronaut-data/latest/guide/#dbcRepositories[Repository], which uses the previous Java record as a DTO projection.
@@ -103,7 +105,7 @@ Create a Java record to represent a JSON response:
 
 source:BookForSale[]
 
-callout:introspected[1]
+callout:serdeable[1]
 <2> Jackson requires reflection to use Records. With `@ReflectiveAccess` the Micronaut framework will add the class to the GraalVM `reflect-config.json` file.
 callout:constraints[3]
 

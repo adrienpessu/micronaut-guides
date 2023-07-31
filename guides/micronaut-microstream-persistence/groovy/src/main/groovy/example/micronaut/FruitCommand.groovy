@@ -1,12 +1,13 @@
 package example.micronaut
 
 import io.micronaut.core.annotation.Creator
-import io.micronaut.core.annotation.Introspected
 import io.micronaut.core.annotation.NonNull
 import io.micronaut.core.annotation.Nullable
-import javax.validation.constraints.NotBlank
+import io.micronaut.serde.annotation.Serdeable;
 
-@Introspected // <1>
+import jakarta.validation.constraints.NotBlank
+
+@Serdeable // <1>
 class FruitCommand {
 
     @NonNull

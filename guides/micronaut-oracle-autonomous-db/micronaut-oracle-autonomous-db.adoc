@@ -83,7 +83,7 @@ common:default-package.adoc[]
 
 diffLink:[]
 
-common:annotationprocessors.adoc[]
+https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html[Setup IntelliJ IDEA to develop Micronaut Applications].
 
 === Entity class
 
@@ -123,6 +123,8 @@ Edit `src/main/resources/logback.xml` and add the following (anywhere in the `<c
 ----
 
 Replace the generated `application.yml` with this:
+
+common:yaml-dependency.adoc[]
 
 resource:application.yml[]
 

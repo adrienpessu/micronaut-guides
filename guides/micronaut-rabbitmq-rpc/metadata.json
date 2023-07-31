@@ -5,20 +5,18 @@
   "tags": ["rabbitmq", "rpc", "messaging"],
   "categories": ["Messaging"],
   "publicationDate": "2019-03-24",
-  "skipMavenTests": true,
-  "skipGradleTests": true,
   "apps": [
     {
       "name": "bookcatalogue",
-      "features": ["rabbitmq", "graalvm"]
+      "features": ["yaml", "rabbitmq", "graalvm", "serialization-jackson"]
     },
     {
       "name": "bookinventory",
-      "features": ["rabbitmq", "graalvm"]
+      "features": ["yaml", "rabbitmq", "graalvm", "serialization-jackson","validation"]
     },
     {
       "name": "bookrecommendation",
-      "features": ["rabbitmq", "graalvm", "reactor"]
+      "features": ["yaml", "rabbitmq", "graalvm", "reactor", "serialization-jackson"]
     }
   ]
 }

@@ -4,9 +4,9 @@ import io.micronaut.http.HttpRequest
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.security.authentication.UsernamePasswordCredentials
-import io.micronaut.security.token.jwt.endpoints.TokenRefreshRequest
-import io.micronaut.security.token.jwt.render.AccessRefreshToken
-import io.micronaut.security.token.jwt.render.BearerAccessRefreshToken
+import io.micronaut.security.endpoints.TokenRefreshRequest
+import io.micronaut.security.token.render.AccessRefreshToken
+import io.micronaut.security.token.render.BearerAccessRefreshToken
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import jakarta.inject.Inject
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -15,11 +15,7 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 
 @MicronautTest(rollback = false)
-internal class OauthAccessTokenTest {
-
-    @Inject
-    @field:Client("/")
-    lateinit var client: HttpClient
+internal class OauthAccessTokenTest(@Client("/") val client: HttpClient) {
 
     @Inject
     lateinit var refreshTokenRepository: RefreshTokenRepository
@@ -41,7 +37,7 @@ internal class OauthAccessTokenTest {
 
         Thread.sleep(1000) // sleep for one second to give time for the issued at `iat` Claim to change
         val refreshResponse = client.toBlocking().retrieve(HttpRequest.POST("/oauth/access_token",
-                TokenRefreshRequest(rsp.refreshToken)), AccessRefreshToken::class.java) // <1>
+                TokenRefreshRequest(TokenRefreshRequest.GRANT_TYPE_REFRESH_TOKEN, rsp.refreshToken)), AccessRefreshToken::class.java) // <1>
 
         assertNotNull(refreshResponse.accessToken)
         assertNotEquals(rsp.accessToken, refreshResponse.accessToken) // <2>

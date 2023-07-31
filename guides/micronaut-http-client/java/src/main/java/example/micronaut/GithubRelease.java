@@ -1,29 +1,7 @@
 package example.micronaut;
 
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
 
-@Introspected
-public class GithubRelease {
-
-    private String name;
-    private String url;
-
-    public GithubRelease() {
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
+@Serdeable
+public record GithubRelease(String name, String url) {
 }

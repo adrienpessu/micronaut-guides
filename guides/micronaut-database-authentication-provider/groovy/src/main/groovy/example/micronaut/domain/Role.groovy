@@ -1,15 +1,18 @@
 package example.micronaut.domain
 
-import grails.gorm.annotation.Entity
-import org.grails.datastore.gorm.GormEntity
-import io.micronaut.core.annotation.Introspected
+import io.micronaut.data.annotation.MappedEntity
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.Id
+import jakarta.validation.constraints.NotBlank
+import io.micronaut.serde.annotation.Serdeable
 
-@Introspected
-@Entity // <1>
-class Role implements GormEntity<Role> {  // <2>
+@Serdeable // <1>
+@MappedEntity // <2>
+class Role {
+    @Id  // <3>
+    @GeneratedValue // <4>
+    Long id
+
+    @NotBlank
     String authority
-
-    static constraints = {
-        authority nullable: false, unique: true
-    }
 }

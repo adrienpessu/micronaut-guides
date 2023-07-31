@@ -5,16 +5,14 @@ import io.micronaut.http.HttpRequest
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import jakarta.inject.Inject
 
 @MicronautTest
-class BooksControllerTest {
-    @Inject
-    @field:Client("/")
-    lateinit var client: HttpClient
+class BooksControllerTest(@Client("/") val client: HttpClient) {
 
     @Test
     fun testRetrieveBooks() {
